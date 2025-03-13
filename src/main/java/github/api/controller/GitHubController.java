@@ -1,5 +1,8 @@
-package github;
+package github.api.controller;
 
+
+import github.dto.ErrorResponse;
+import github.service.GitHubService;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -12,17 +15,25 @@ import jakarta.ws.rs.core.Response;
 
 @Path("/github")
 @Produces(MediaType.APPLICATION_JSON)
-public class GitHubResource {
+public class GitHubController {
 
     @Inject
     GitHubService gitHubService;
 
     @GET
     @Path("/repos/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> getUserRepos(@PathParam("username") String username) {
         return gitHubService.getRepositories(username)
                 .map(repos -> Response.ok(repos).build())
                 .onFailure(NotFoundException.class)
-                .recoverWithItem(() -> Response.status(404).entity(new ErrorResponse(404, "User not found")).build());
+                .recoverWithItem(t -> Response.status(404)
+                        .entity(new ErrorResponse(404, "User not found"))
+                        .build());
     }
+
+
+
+
+
 }

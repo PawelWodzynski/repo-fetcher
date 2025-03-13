@@ -1,5 +1,7 @@
-package github;
+package github.service;
 
+import github.api.client.GitHubClient;
+import github.dto.RepositoryDTO;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -18,7 +20,7 @@ public class GitHubService {
         return gitHubClient.getRepositories(username)
                 .onItem().transform(repos ->
                         repos.stream()
-                                .filter(repo -> !repo.isFork()) // Filtrujemy tylko nie-forki
+                                .filter(repo -> !repo.isFork())
                                 .map(repo ->
                                         gitHubClient.getBranches(repo.owner().login(), repo.name())
                                                 .map(branches -> new RepositoryDTO(repo.name(), repo.owner().login(), branches))
